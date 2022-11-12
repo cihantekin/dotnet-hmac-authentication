@@ -1,3 +1,4 @@
+using dotnet_hmac_authentication.ActionFilter;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dotnet_hmac_authentication.Controllers
@@ -18,6 +19,7 @@ namespace dotnet_hmac_authentication.Controllers
             _logger = logger;
         }
 
+        [ServiceFilter(typeof(HmacAuthenticationAttribute))]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
