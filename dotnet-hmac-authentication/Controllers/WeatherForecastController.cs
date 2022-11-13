@@ -1,4 +1,5 @@
 using dotnet_hmac_authentication.ActionFilter;
+using dotnet_hmac_authentication.client;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dotnet_hmac_authentication.Controllers
@@ -19,10 +20,11 @@ namespace dotnet_hmac_authentication.Controllers
             _logger = logger;
         }
 
-        [ServiceFilter(typeof(HmacAuthenticationAttribute))]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
+            var httpRequestSender = new HttpRequestSender();
+            var response = httpRequestSender.SendAsync();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
@@ -31,5 +33,20 @@ namespace dotnet_hmac_authentication.Controllers
             })
             .ToArray();
         }
+
+        [ServiceFilter(typeof(HmacAuthenticationAttribute))]
+        [HttpPost]
+        public IEnumerable<WeatherForecast> Post([FromBody]string payload)
+        {
+            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            {
+                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = Summaries[Random.Shared.Next(Summaries.Length)],
+                Payload = payload
+            })
+            .ToArray();
+        }
+
     }
 }
