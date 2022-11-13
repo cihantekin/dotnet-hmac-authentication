@@ -1,4 +1,4 @@
-namespace dotnet_hmac_authentication
+namespace dotnet_hmac_authentication.client
 {
     public class WeatherForecast
     {
