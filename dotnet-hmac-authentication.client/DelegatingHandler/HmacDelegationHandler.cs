@@ -34,8 +34,7 @@ namespace dotnet_hmac_authentication.client.DelegationHandler
 
         private static string ComputeContentHash(string content)
         {
-            using var sha256 = SHA256.Create();
-            byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(content));
+            byte[] hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(content));
             return Convert.ToBase64String(hashedBytes);
         }
 
