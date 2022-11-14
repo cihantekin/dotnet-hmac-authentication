@@ -26,6 +26,7 @@ namespace dotnet_hmac_authentication.ActionFilter
                 if (request.Headers.Authorization.FirstOrDefault() is null || request.Headers.Authorization.FirstOrDefault()!.Split(' ').Length != 2)
                 {
                     context.Result = new StatusCodeResult(StatusCodes.Status401Unauthorized);
+                    _logger.LogCritical($"Unable to authenticate request because of no authorization header {request.Host}");
                     return;
                 }
 
@@ -41,6 +42,7 @@ namespace dotnet_hmac_authentication.ActionFilter
                 if (!IsSignatureValid(authorizationHeader, signature) || !IsHashedPayloadValid(request, hashedBody) || !IsRequestWithinAcceptableTime(request))
                 {
                     context.Result = new StatusCodeResult(StatusCodes.Status401Unauthorized);
+                    _logger.LogCritical($"Unable authenticate request for webhook endpoint. Invalid signature! {request.Host}");
                     return;
                 }
             }
@@ -69,7 +71,7 @@ namespace dotnet_hmac_authentication.ActionFilter
 
         private string ComputeSignature(string stringToSign)
         {
-            string secret = _configuration.GetSection("HmacAuthenticationKey").Value;
+            string secret = _configuration.GetSection("HmacAuthenticationKey")?.Value;
             using var hmacsha256 = new HMACSHA256(Convert.FromBase64String(secret));
             var bytes = Encoding.ASCII.GetBytes(stringToSign);
             var hashedBytes = hmacsha256.ComputeHash(bytes);
